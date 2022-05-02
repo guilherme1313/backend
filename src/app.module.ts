@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductoModule } from './producto/producto.module';
+import { ClientsModule } from './clients/clients.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -26,7 +27,8 @@ import { ProductoModule } from './producto/producto.module';
     }),
     inject: [ConfigService],
   }),
-  ProductoModule
+  ProductoModule,
+  ClientsModule
 ],
   controllers: [AppController],
   providers: [AppService],
