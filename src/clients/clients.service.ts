@@ -1,22 +1,21 @@
 import { MessageDto } from './../common/message.dto';
-import { ClientsRepository } from './clients.repository';
 import { Client } from './entities/client.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectModel } from '@nestjs/sequelize';
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
+
 
 @Injectable()
 export class ClientsService {
 
   constructor(
-    @InjectRepository(Client)
-    private clientsRepository: ClientsRepository
-) { }
-
+    @InjectModel(Client)
+    private readonly client: typeof Client,
+  ) {}
 
   async getAll(): Promise<Client[]> {
-    const list = await this.clientsRepository.find();
+    const list = await this.client.findAll();
     if (!list.length) {
         throw new NotFoundException(new MessageDto('A lista esta vazia'));
     }
@@ -24,7 +23,10 @@ export class ClientsService {
   }
 
   async findById(id: number): Promise<Client> {
-    const clients = await this.clientsRepository.findOne(id);
+    const clients = await this.client.findOne({ where: {
+      id: id
+    },
+  });
     if (!clients) {
         throw new NotFoundException(new MessageDto('Cliente não existe'));
     }
@@ -33,7 +35,8 @@ export class ClientsService {
 
 
   async findByEmail(email: string): Promise<Client> {
-    const clients = await this.clientsRepository.findOne({ email: email });
+    const clients = await this.client.findOne({ where: {email: email},
+  });
 
     return clients;
   }
@@ -41,10 +44,12 @@ export class ClientsService {
 
 
     async create(dto: CreateClientDto): Promise<any> {
+
+      
       const exists = await this.findByEmail(dto.email);
       if (exists) throw new BadRequestException(new MessageDto('Cliente ja esta cadastrado!'))
-      const clients = this.clientsRepository.create(dto);
-      await this.clientsRepository.save(clients);
+      const clients = await this.client.create(dto as any);
+      await clients.save();
       return new MessageDto('Cliente cadastrado');
   }
 
@@ -60,16 +65,16 @@ export class ClientsService {
       dto.cpf ? clients.cpf = dto.cpf : clients.cpf = clients.cpf;
      
 
-      await this.clientsRepository.save(clients);
+      await clients.save();
       return new MessageDto(`Cliente ${clients.name} atualizado`);
 
   }
 
 
   async delete(id: number): Promise<any> {
-      const clients = await this.findById(id);
-      await this.clientsRepository.delete(clients);
-      return new MessageDto(`Cliente ${clients.name} excluido`);
+    const clients = await this.findById(id);
+      await clients.destroy();
+       return new MessageDto(`Cliente ${clients.name} excluido`);
   }
 
 }

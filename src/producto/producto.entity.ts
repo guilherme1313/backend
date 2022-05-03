@@ -1,14 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({name: 'producto'})
-export class ProductoEntity {
+import { Table, Model, PrimaryKey, Column, AutoIncrement } from 'sequelize-typescript';
+@Table({tableName: 'product'})
+export class ProductoEntity extends Model {
 
-    @PrimaryGeneratedColumn()
+    @AutoIncrement
+    @PrimaryKey
+    @Column
     id: number;
 
-    @Column({type: 'varchar', nullable: false, unique: true})
+    @Column
     name: string;
 
-    @Column({type: 'float', nullable: false})
+    @Column
     price: number;
 }

@@ -1,36 +1,36 @@
+import { ProductoEntity } from './producto/producto.entity';
+import { Client } from './clients/entities/client.entity';
 import { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_DATABASE } from './config/constants';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { ProductoModule } from './producto/producto.module';
 import { ClientsModule } from './clients/clients.module';
+import { AuthModule } from './auth/auth.module';
+import { UsuarioModule } from './usuario/usuario.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({
-    envFilePath: '.env',
-    isGlobal: true
-  }),
-  TypeOrmModule.forRootAsync({
-    imports: [ConfigModule],
-    useFactory: (configService: ConfigService) => ({
-      type: 'mariadb',
-      host: configService.get<string>(DB_HOST),
-      port: +configService.get<number>(DB_PORT),
-      username: configService.get<string>(DB_USER),
-      password: configService.get<string>(DB_PASSWORD),
-      database: configService.get<string>(DB_DATABASE),
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+  imports: [
+    SequelizeModule.forRoot({
+      dialect: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '',
+      database: 'tutorial_nest',
+      autoLoadModels: true,
       synchronize: true,
-      logging: false
+      models:[Client, ProductoEntity]
     }),
-    inject: [ConfigService],
-  }),
   ProductoModule,
-  ClientsModule
+  ClientsModule,
+  AuthModule,
+  UsuarioModule
 ],
   controllers: [AppController],
   providers: [AppService],
+  exports:[SequelizeModule]
 })
 export class AppModule {}

@@ -1,20 +1,21 @@
-import { Entity } from 'typeorm';
-import { Column } from 'typeorm';
-import { PrimaryGeneratedColumn } from 'typeorm';
-@Entity({name: 'clients'})
-export class Client {
-    @PrimaryGeneratedColumn()
+
+import { AutoIncrement, Column, Model, PrimaryKey, Table } from 'sequelize-typescript';
+@Table({tableName: 'clients'})
+export class Client extends Model{
+    @AutoIncrement
+    @PrimaryKey
+    @Column
     id: number
 
-    @Column({type: 'varchar', nullable: false})
+    @Column
     name: string
 
-    @Column({type: 'varchar', nullable: false, unique: true})
+    @Column
     email: string
 
-    @Column({type: 'varchar', nullable: false})
+    @Column
     telefone: string
 
-    @Column({type: 'varchar', nullable: false, unique: true})
+    @Column
     cpf: string
 }
